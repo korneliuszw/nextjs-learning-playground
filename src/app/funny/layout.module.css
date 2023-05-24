@@ -1,0 +1,19 @@
+.dashboard {
+
+    grid-template-areas: "header header header"
+                        "nav main right";
+    grid-template-columns: 1fr 3fr 1fr;
+    display: grid;
+}
+
+.header {
+    grid-area: header;
+}
+
+.nav {
+    grid-area: nav;
+}
+
+.main {
+    grid-area: main;
+}
