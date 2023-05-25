@@ -4,10 +4,20 @@ import {revalidatePath} from "next/cache";
 import {action} from "@/action";
 import {z} from "zod";
 
-export async function removePost(postId: string) {
-    await prisma.entry.delete({where: {id: postId}})
-    revalidatePath('/funny/posts')
-}
+const removePostSchema = z.object({
+    id: z.string().uuid()
+})
+
+export const removePost = action({input: removePostSchema, withAuth: true},
+    async ({id}, {userId}) => {
+        await prisma.entry.deleteMany({
+            where: {
+                id,
+                authorId: userId
+            }
+        })
+        revalidatePath('/funny/posts')
+    })
 
 const addPostSchema = z.object({
     title: z.string().min(5),

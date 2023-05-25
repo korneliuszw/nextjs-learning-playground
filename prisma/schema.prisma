@@ -24,13 +24,16 @@ model Comment {
   lastUpdatedAt DateTime @updatedAt
   text          String
   authorId      String
-  author        User     @relation(fields: [authorId], references: [id])
+  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  entryId       String
+  entry         Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
 }
 
 model Entry {
-  id          String @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String
-  author      User   @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
+  Comment     Comment[]
 }

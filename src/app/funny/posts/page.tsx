@@ -1,6 +1,6 @@
 import {Entry} from "@prisma/client";
 import {prisma} from "@/db";
-import Post from "@/components/Post";
+import PostSummary from "@/components/Post/PostSummary";
 import AddPost from "@/components/AddPost";
 
 async function getPosts(): Promise<Entry[]> {
@@ -12,7 +12,7 @@ export default async function Posts() {
     const posts = await getPosts();
     return (
         <>
-            {posts.map(post => <Post post={post} key={post.id}/>)}
+            {posts.map(post => <PostSummary post={post} key={post.id}/>)}
             <AddPost/>
         </>
     )
