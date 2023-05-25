@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, {AuthOptions} from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import {prisma} from "@/db";
 import {User} from '@prisma/client'
 import bcrypt from "bcrypt";
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
     providers: [
         Credentials({
             credentials: {
@@ -26,13 +26,14 @@ const handler = NextAuth({
     },
     callbacks: {
         redirect: async ({url, baseUrl}) => {
-            console.log(url)
             return url.startsWith(baseUrl) ? Promise.resolve(url) : Promise.resolve(baseUrl)
         }
     },
     session: {
         strategy: "jwt"
     }
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export {handler as GET, handler as POST}
