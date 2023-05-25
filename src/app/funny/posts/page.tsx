@@ -3,13 +3,8 @@ import {prisma} from "@/db";
 import Post from "@/components/Post";
 import AddPost from "@/components/AddPost";
 
-function getPosts(): Promise<Entry[]> {
-    return new Promise((resolve) => {
-        setTimeout(async () => {
-            const entries = await prisma.entry.findMany()
-            resolve(entries)
-        }, 5000)
-    })
+async function getPosts(): Promise<Entry[]> {
+    return await prisma.entry.findMany()
 }
 
 
