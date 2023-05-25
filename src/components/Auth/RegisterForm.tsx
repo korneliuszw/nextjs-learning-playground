@@ -4,6 +4,7 @@ import {FormEvent, ReactNode, useLayoutEffect} from "react";
 import {useAction} from "next-safe-action/hook";
 import {register} from "@/actions/register";
 import {useRouter} from "next/navigation";
+import FormStatus from "@/components/FormStatus";
 
 const serverErrorMap = {
     'user_exists': 'This e-mail address is already associated with a user'
@@ -34,20 +35,9 @@ export const RegisterForm = ({children}: { children: ReactNode }) => {
     return (
         <>
             {isExecuting && <div>Processing your request</div>}
-            {res?.data?.success &&
-                <div className={"alert alert-success shadow-lg"}>Your account has been created. You will be redirect to
-                    login page in 5 seconds.</div>}
-            {(res?.validationError || res?.serverError || res?.data?.error) &&
-                <div className={"alert alert-error shadow-lg flex-col"}>
-                    {res.validationError && res.validationError.nickname &&
-                        <div>Nickname: {res.validationError.nickname.join(', ')}</div>}
-                    {res.validationError && res.validationError.password &&
-                        <div>Password: {res.validationError.password.join(', ')}</div>}
-                    {res.validationError && res.validationError.email &&
-                        <div>Email: {res.validationError.email.join(', ')}</div>}
-                    {res.serverError && <div>Something went wrong with your request</div>}
-                    {res.data?.error && <div>{serverErrorMap[res.data.error.reason] ?? "Unknown error"}</div>}
-                </div>}
+            <FormStatus result={res}
+                        validationFieldMap={{'nickname': 'Nickname', 'email': 'E-mail', 'password': 'Password'}}
+                        successMessage={"Registered! Redirecting in 5 seconds"}/>
             <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
                 {children}
             </form>
