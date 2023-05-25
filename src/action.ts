@@ -1,11 +1,17 @@
 import {createSafeActionClient} from "next-safe-action";
-import {getServerSession} from "next-auth";
+import {cookies, headers} from "next/headers";
+import {getToken} from "next-auth/jwt";
+
 
 export const action = createSafeActionClient({
     getAuthData: async () => {
-        const session = await getServerSession()
-        console.log(session)
-        if (!session?.user) throw new Error("Not logged in")
-        return session.user
+        const session = await getToken({
+            req: {
+                headers: await headers(),
+                cookies: await cookies() // @ts-ignore
+            }
+        }) // Workaround for getServerSession() bug
+        if (!session?.sub) throw new Error("Not logged in")
+        return {email: session.email, userId: session.sub}
     }
 })
