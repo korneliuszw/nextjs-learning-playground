@@ -2,15 +2,13 @@
 
 // import {addPost} from "@/actions/post";
 import Input from "@/components/Input";
-import {useSession} from "next-auth/react";
 import {FormEvent} from "react";
 import {useAction} from "next-safe-action/hook";
 import {addPost} from "@/actions/post";
 import FormStatus from "@/components/FormStatus";
 
 export default function AddPost() {
-    const {status} = useSession()
-    const {execute, isExecuting, res} = useAction(addPost)
+    const {execute, res} = useAction(addPost)
     const onSubmit = (event: FormEvent) => {
         event.preventDefault()
         const form = event.target as HTMLFormElement

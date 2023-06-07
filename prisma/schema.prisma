@@ -19,14 +19,17 @@ model User {
 }
 
 model Comment {
-  id            String   @id @default(uuid())
-  createdAt     DateTime @default(now())
-  lastUpdatedAt DateTime @updatedAt
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  lastUpdatedAt DateTime  @updatedAt
   text          String
   authorId      String
-  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   entryId       String
-  entry         Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entry         Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  responses     Comment[] @relation("ResponseToComment")
+  responseTo    Comment?  @relation("ResponseToComment", fields: [commentId], references: [id])
+  commentId     String?
 }
 
 model Entry {

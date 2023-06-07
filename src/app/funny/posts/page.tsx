@@ -7,7 +7,6 @@ async function getPosts(): Promise<Entry[]> {
     return await prisma.entry.findMany()
 }
 
-
 export default async function Posts() {
     const posts = await getPosts();
     return (
