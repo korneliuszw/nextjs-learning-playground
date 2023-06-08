@@ -1,21 +1,35 @@
-import Link from "next/link";
 import {Reply} from "@/components/Comment/Reply";
+import {prisma} from "@/db";
 
 interface CommentProps {
-    authorName: string;
-    text: string;
-    hasResponses?: boolean
     commentId: string;
     postId: string;
 }
 
-export function Comment({authorName, text, hasResponses, commentId, postId}: CommentProps) {
-    return <div className={"border-l-1 border-accent px-2 py-1 flex flex-col"}>
-        <div className={"text-sm text-secondary"}>{authorName}</div>
-        <div className={"text-primary leading-relaxed"}>{text}</div>
-        {hasResponses && <div className={"link-accent"}>
-            <Link href={`/funny/posts/threads/${commentId}`}>See replies</Link>
-        </div>}
+export async function Comment({commentId, postId}: CommentProps) {
+    const comment = await prisma.comment.findFirstOrThrow({
+        where: {
+            id: commentId
+        },
+        select: {
+            text: true,
+            responses: {
+                select: {
+                    id: true
+                }
+            },
+            author: {
+                select: {
+                    nickname: true
+                }
+            },
+        },
+    })
+
+    return <div className={"border-l-1 border-l border-accent px-2 m-2 mb-4 flex flex-col"}>
+        <div className={"text-sm text-secondary"}>{comment.author.nickname}</div>
+        <div className={"text-primary leading-relaxed"}>{comment.text}</div>
         <Reply postId={postId} commentThreadId={commentId}/>
+        {comment.responses.map(response => <Comment commentId={response.id} postId={postId} key={response.id}/>)}
     </div>
 }

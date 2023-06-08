@@ -7,10 +7,6 @@ export default async function Comments({params: {postId}}: DetailedPostProps) {
     const comments = await prisma.comment.findMany({
         select: {
             id: true,
-            author: {
-                select: {nickname: true}
-            },
-            text: true
         },
         where: {
             responseTo: null
@@ -18,7 +14,7 @@ export default async function Comments({params: {postId}}: DetailedPostProps) {
     })
     return <>
         <Reply postId={postId}/>
-        {comments.map(comment => <Comment authorName={comment.author.nickname} text={comment.text}
-                                          commentId={comment.id} postId={postId} key={comment.id}/>)}
+        {comments.map(comment => <Comment
+            commentId={comment.id} postId={postId} key={comment.id}/>)}
     </>
 }
