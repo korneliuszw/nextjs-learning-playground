@@ -1,20 +1,21 @@
-import {prisma} from "@/db";
 import {Reply} from "@/components/Comment/Reply";
 import {DetailedPostProps} from "@/app/funny/posts/[postId]/page";
+import {getComments} from "@/apiActions/comments";
+import {dehydrate, Hydrate, QueryClient} from "@tanstack/react-query";
 import {Comment} from "@/components/Comment/Comment";
 
+
 export default async function Comments({params: {postId}}: DetailedPostProps) {
-    const comments = await prisma.comment.findMany({
-        select: {
-            id: true,
-        },
-        where: {
-            responseTo: null
-        }
-    })
+    const queryClient = new QueryClient()
+    await queryClient.prefetchQuery(['comments', {
+        postId,
+        commentId: null
+    }], () => getComments(postId))
+    const dehydrated = dehydrate(queryClient)
     return <>
         <Reply postId={postId}/>
-        {comments.map(comment => <Comment
-            commentId={comment.id} postId={postId} key={comment.id}/>)}
+        <Hydrate state={dehydrated}>
+            <Comment postId={postId} key={"TOP"}/>
+        </Hydrate>
     </>
 }
