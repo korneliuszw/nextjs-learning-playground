@@ -1,17 +1,26 @@
 import {prisma} from "@/db";
 import {NextRequest, NextResponse} from "next/server";
 
+export interface ApiComment {
+    id: string;
+    text: string;
+    author: {
+        nickname: string;
+    };
+    _count: {
+        responses: number;
+    }
+}
+
+
 interface GetCommentParams {
     params: {
         postId: string
     }
 }
 
-export async function GET(request: NextRequest, {params: {postId}}: GetCommentParams) {
-    const parentCommentId = request.nextUrl.searchParams.get('commentId')
-    console.log(request.nextUrl.searchParams.entries())
-    console.log(postId)
-    const comments = await prisma.comment.findMany({
+export function getCommentsServer(postId: string, parentCommentId: string | null): Promise<ApiComment[]> {
+    return prisma.comment.findMany({
         select: {
             id: true,
             text: true,
@@ -29,9 +38,13 @@ export async function GET(request: NextRequest, {params: {postId}}: GetCommentPa
         where: {
             responseTo: parentCommentId ? {
                 id: parentCommentId!
-            } : undefined
+            } : null
         }
     })
-    console.log(comments)
+}
+
+export async function GET(request: NextRequest, {params: {postId}}: GetCommentParams) {
+    const parentCommentId = request.nextUrl.searchParams.get('commentId')
+    const comments = await getCommentsServer(postId, parentCommentId)
     return NextResponse.json(comments)
 }

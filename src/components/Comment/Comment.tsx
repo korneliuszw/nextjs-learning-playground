@@ -10,7 +10,7 @@ interface CommentProps {
 }
 
 export function Comment({commentId, postId}: CommentProps) {
-    const {data: comments, isError} = useQuery(['comments', {
+    const {data: comments} = useQuery(['comments', {
         postId,
         commentId
     }], () => getComments(postId, commentId), {

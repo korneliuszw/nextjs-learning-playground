@@ -1,17 +1,8 @@
-interface ApiComment {
-    id: string;
-    text: string;
-    author: {
-        nickname: string;
-    };
-    _count: {
-        responses: number;
-    }
-}
+import {ApiComment} from "@/app/api/comments/[postId]/route";
 
 export async function getComments(postId: string, commentId?: string): Promise<ApiComment[]> {
     const query = commentId ? `/?commentId=${commentId}` : ""
-    const result = await fetch(`/api/comments/${postId}${query}`);
+    const result = await fetch(`http://localhost:3000/api/comments/${postId}${query}`);
     if (!result.ok) throw new Error("Failed to fetch comments")
     return result.json()
 }
