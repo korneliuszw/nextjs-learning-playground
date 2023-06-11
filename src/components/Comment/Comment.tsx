@@ -3,6 +3,7 @@
 import {Reply} from "@/components/Comment/Reply";
 import {useQuery} from "@tanstack/react-query";
 import {getComments} from "@/apiActions/comments";
+import {Suspense} from "react";
 
 interface CommentProps {
     commentId?: string;
@@ -14,7 +15,7 @@ export function Comment({commentId, postId}: CommentProps) {
         postId,
         commentId
     }], () => getComments(postId, commentId), {
-        useErrorBoundary: true,
+        // useErrorBoundary: true,
     })
 
     return <>
@@ -23,7 +24,9 @@ export function Comment({commentId, postId}: CommentProps) {
                 <div className={"text-sm text-secondary"}>{comment.author.nickname}</div>
                 <div className={"text-primary leading-relaxed"}>{comment.text}</div>
                 <Reply postId={postId} commentThreadId={commentId}/>
-                {comment._count.responses > 0 && <Comment postId={postId} commentId={comment.id} key={commentId}/>}
+                <Suspense fallback={<h1>Loading comments...</h1>}>
+                    {comment._count.responses > 0 && <Comment postId={postId} commentId={comment.id} key={commentId}/>}
+                </Suspense>
             </div>))}
     </>
 }
