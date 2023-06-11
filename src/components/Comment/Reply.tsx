@@ -3,7 +3,7 @@
 import {Suspense, useCallback, useState} from "react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {createReply} from "@/apiActions/comments";
-import {ApiComment} from "@/app/api/comments/[postId]/route";
+import {GetCommentResponse} from "@/app/api/comments/[postId]/route";
 
 interface ReplyProps {
     commentThreadId?: string;
@@ -23,7 +23,13 @@ export function Reply({commentThreadId, postId}: ReplyProps) {
             queryClient.setQueryData(['comments', {
                 postId,
                 commentId: commentThreadId
-            }], (old?: ApiComment[]) => old ? [data, ...old] : [data])
+            }], (old?: GetCommentResponse) => {
+                if (!old) return {total: 1, comments: [data]}
+                return {
+                    total: old.total + 1,
+                    comments: [data, ...old.comments]
+                }
+            })
             setReplyText('')
         },
         useErrorBoundary: true

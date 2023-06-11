@@ -1,5 +1,7 @@
 import {prisma} from "@/db";
 import {NextRequest, NextResponse} from "next/server";
+import {pageCalculateSkip, requestGetPage} from "@/utils/pagination";
+import {COMMENTS_PER_PAGE} from "@/constants/pagination";
 
 
 export interface ApiComment {
@@ -20,8 +22,12 @@ interface GetCommentParams {
     }
 }
 
-export const commentSelect = {
+export interface GetCommentResponse {
+    comments: ApiComment[],
+    total: number
+}
 
+export const commentSelect = {
     id: true,
     text: true,
     author: {
@@ -36,19 +42,32 @@ export const commentSelect = {
     }
 }
 
-export function getCommentsServer(postId: string, parentCommentId: string | null): Promise<ApiComment[]> {
-    return prisma.comment.findMany({
+
+export async function getCommentsServer(postId: string, parentCommentId: string | null, skip: number = 0, take: number = COMMENTS_PER_PAGE): Promise<GetCommentResponse> {
+    const where = {
+        responseTo: parentCommentId ? {
+            id: parentCommentId!
+        } : null
+    }
+    const transactionArray = [prisma.comment.findMany({
         select: commentSelect,
-        where: {
-            responseTo: parentCommentId ? {
-                id: parentCommentId!
-            } : null
-        }
+        where,
+        skip,
+        take
+    }), prisma.comment.count({
+        where
     })
+    ]
+    const [comments, total] = await prisma.$transaction(transactionArray)
+    return {
+        comments: comments as ApiComment[],
+        total: total as number
+    }
 }
 
 export async function GET(request: NextRequest, {params: {postId}}: GetCommentParams) {
     const parentCommentId = request.nextUrl.searchParams.get('commentId')
-    const comments = await getCommentsServer(postId, parentCommentId)
+    const skip = pageCalculateSkip(requestGetPage(request), COMMENTS_PER_PAGE)
+    const comments = await getCommentsServer(postId, parentCommentId, skip)
     return NextResponse.json(comments)
 }
