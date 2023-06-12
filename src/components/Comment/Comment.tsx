@@ -35,7 +35,6 @@ export function Comment({commentId, postId, depth = 0}: CommentProps) {
 
     const totalPages = useMemo(() => getNumberOfPages(comments?.total ?? 0, COMMENTS_PER_PAGE), [comments])
 
-    console.log(comments)
     return <>
         {!shouldFetch && <button onClick={() => setShouldFetch(true)}>Load comments</button>}
         {comments?.comments?.map(comment => (

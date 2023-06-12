@@ -12,10 +12,8 @@ export const authOptions: AuthOptions = {
                 password: {label: "Password", type: "password", placeholder: "Password"}
             },
             async authorize(credentials): Promise<User | null> {
-                console.log('hello??')
                 if (!credentials?.password || !credentials?.email) return null
                 const userWithEmail = await prisma.user.findFirst({where: {email: credentials.email}})
-                console.log(userWithEmail)
                 if (!userWithEmail || !(await bcrypt.compare(credentials.password, userWithEmail.hashedPassword))) return null
                 return userWithEmail
             }

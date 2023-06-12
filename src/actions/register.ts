@@ -14,9 +14,7 @@ const registerSchema = z.object({
 })
 
 export const register = action({input: registerSchema}, async ({email, password, nickname}) => {
-    console.log('huj')
     const existentUser = await prisma.user.findFirst({where: {email}})
-    console.log(existentUser)
     if (existentUser) return {
         error: {
             reason: "user_exists"

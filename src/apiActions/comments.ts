@@ -5,7 +5,6 @@ export async function getComments(postId: string, page: number, commentId?: stri
     const query = `/?page=${page}` + (commentId ? `&commentId=${commentId}` : "")
     const result = await fetch(`http://localhost:3000/api/comments/${postId}${query}`);
     if (!result.ok) throw new Error("Failed to fetch comments")
-    console.log('OK')
     return result.json()
 }
 
